@@ -1,0 +1,177 @@
+<div class="max-w-3xl mx-auto space-y-6 text-left" id="application-details">
+  <button
+    type="button"
+    (click)="backToQueue()"
+    class="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition cursor-pointer bg-transparent border-none"
+  >
+    <svg lucideArrowLeft class="h-4 w-4"></svg>
+    <span>Back to Queue</span>
+  </button>
+
+  @if (error) {
+    <div class="bg-white p-12 text-center rounded-2xl shadow-sm border border-slate-100 space-y-4">
+      <svg lucideAlertCircle class="h-10 w-10 text-slate-300 mx-auto"></svg>
+      <h3 class="font-extrabold text-slate-800">Application File Not Found</h3>
+      <button (click)="backToQueue()" class="text-blue-600 hover:underline cursor-pointer bg-transparent border-none">
+        Return to queue
+      </button>
+    </div>
+  } @else if (application()) {
+    @let app = application()!;
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 space-y-6">
+      
+      <!-- Header dossier info -->
+      <div class="pb-5 border-b border-slate-50 flex justify-between items-center">
+        <div>
+          <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Artisan Application Dossier</span>
+          <h1 class="text-xl font-black text-slate-900 mt-0.5">{{ app.firstName }} {{ app.lastName }}</h1>
+          <p class="text-xs text-slate-400 mt-0.5">{{ app.category?.name || 'Artisan' }} • Submitted {{ app.createdAt | date:'shortDate' }}</p>
+        </div>
+
+        <span class="px-3 py-1 bg-amber-50 text-amber-700 font-black text-xs rounded-full border border-amber-100 uppercase tracking-widest">
+          {{ app.status }}
+        </span>
+      </div>
+
+      <!-- Dossier contents: bio and phone details -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 text-xs">
+        <div class="space-y-2">
+          <h3 class="font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Contact & Office Details</h3>
+          <div class="space-y-1.5 text-slate-700 font-semibold">
+            <p><strong>Primary Phone:</strong> {{ app.phoneNumber }}</p>
+            <p><strong>City Office:</strong> {{ app.city }}</p>
+            <p><strong>Experience:</strong> {{ app.yearsOfExperience }} Years</p>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Dossier Pitch</h3>
+          <p class="text-slate-500 leading-relaxed italic">
+            "{{ app.description }}"
+          </p>
+        </div>
+      </div>
+
+      <!-- Uploaded PDF checklist -->
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-50 space-y-3">
+        <h3 class="font-bold text-xs text-slate-900">Uploaded Documents (Screening Mandatory)</h3>
+        
+        <div class="space-y-2">
+          <div class="p-3 bg-white rounded-xl border border-slate-100 flex justify-between items-center text-xs">
+            <div class="flex items-center space-x-2.5 overflow-hidden">
+              <div class="p-1.5 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+                <svg lucideFileText class="h-4 w-4"></svg>
+              </div>
+              <div class="overflow-hidden">
+                <span class="font-bold text-slate-800 block truncate">National ID.pdf</span>
+                <span class="text-[10px] text-slate-400">Identification • 1.1 MB</span>
+              </div>
+            </div>
+            <a
+              href="#"
+              (click)="$event.preventDefault()"
+              class="text-[10px] font-bold text-blue-600 hover:underline shrink-0"
+            >
+              View File
+            </a>
+          </div>
+
+          <div class="p-3 bg-white rounded-xl border border-slate-100 flex justify-between items-center text-xs">
+            <div class="flex items-center space-x-2.5 overflow-hidden">
+              <div class="p-1.5 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+                <svg lucideFileText class="h-4 w-4"></svg>
+              </div>
+              <div class="overflow-hidden">
+                <span class="font-bold text-slate-800 block truncate">Professional License.pdf</span>
+                <span class="text-[10px] text-slate-400">Trade Diploma • 2.5 MB</span>
+              </div>
+            </div>
+            <a
+              href="#"
+              (click)="$event.preventDefault()"
+              class="text-[10px] font-bold text-blue-600 hover:underline shrink-0"
+            >
+              View File
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMINISTRATIVE VERIFICATION CHECKS -->
+      <div class="p-5 bg-blue-50/30 rounded-2xl border border-blue-100 space-y-4 text-xs text-slate-700">
+        <h3 class="font-extrabold text-slate-900 text-sm flex items-center space-x-1.5">
+          <svg lucideShieldCheck class="h-4.5 w-4.5 text-blue-600"></svg>
+          <span>Administrative Manual Checklist</span>
+        </h3>
+
+        <p class="text-[10px] text-slate-500">
+          Please check off each verification point after reviewing original documents manually to enable approval triggers.
+        </p>
+
+        <div class="space-y-3 pt-1">
+          <label class="flex items-start space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="vettedCheck1"
+              [(ngModel)]="vettedCheck1"
+              class="h-4.5 w-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-600 cursor-pointer mt-0.5"
+            />
+            <div>
+              <span class="font-bold text-slate-950 block">National Identity Verified</span>
+              <span class="text-[10px] text-slate-400">ID scan matches name and address in Morocco's registry.</span>
+            </div>
+          </label>
+
+          <label class="flex items-start space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="vettedCheck2"
+              [(ngModel)]="vettedCheck2"
+              class="h-4.5 w-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-600 cursor-pointer mt-0.5"
+            />
+            <div>
+              <span class="font-bold text-slate-950 block">Professional Certification Cleared</span>
+              <span class="text-[10px] text-slate-400">Trade diplomas or active carpentry guild registrations verified.</span>
+            </div>
+          </label>
+
+          <label class="flex items-start space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="vettedCheck3"
+              [(ngModel)]="vettedCheck3"
+              class="h-4.5 w-4.5 text-blue-600 rounded border-slate-300 focus:ring-blue-600 cursor-pointer mt-0.5"
+            />
+            <div>
+              <span class="font-bold text-slate-950 block">Criminal Check Verification Passed</span>
+              <span class="text-[10px] text-slate-400">Background and references verification returned zero active complaints.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- DECISION TRIGGER BUTTONS -->
+      <div class="pt-6 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="handleReject()"
+          class="w-full sm:w-auto px-5 py-3 border border-rose-200 text-rose-600 hover:bg-rose-50 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5"
+        >
+          <svg lucideXCircle class="h-4.5 w-4.5"></svg>
+          <span>Reject File Application</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="handleApprove()"
+          [disabled]="!vettedCheck1 || !vettedCheck2 || !vettedCheck3"
+          [class]="'w-full sm:w-auto px-6 py-3 font-extrabold text-white rounded-xl shadow-md transition flex items-center justify-center space-x-1.5 cursor-pointer ' + (vettedCheck1 && vettedCheck2 && vettedCheck3 ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-100' : 'bg-slate-300 text-slate-400 shadow-none cursor-not-allowed')"
+        >
+          <svg lucideShieldCheck class="h-4.5 w-4.5"></svg>
+          <span>Approve & Vette Profile</span>
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

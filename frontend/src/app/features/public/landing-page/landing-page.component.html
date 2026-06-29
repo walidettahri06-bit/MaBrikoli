@@ -1,0 +1,349 @@
+<div class="bg-slate-50 min-h-screen" id="landing-page-root">
+  
+  <!-- 1. HERO SECTION -->
+  <section class="relative overflow-hidden bg-white pt-20 pb-24 border-b border-slate-100">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--color-blue-50),transparent_50%)] opacity-70"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div
+        class="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full border border-blue-100 bg-blue-50/55 text-xs font-bold text-blue-700 mb-6"
+      >
+        <svg lucideSparkles class="h-4 w-4 text-blue-600"></svg>
+        <span>Premium Vetted Artisans on Demand</span>
+      </div>
+
+      <h1
+        class="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-4xl mx-auto"
+      >
+        Find Certified, Verified <span class="text-blue-600">Artisans</span> in Morocco
+      </h1>
+
+      <p
+        class="text-slate-500 text-sm sm:text-lg max-w-2xl mx-auto mt-6 leading-relaxed"
+      >
+        Stop risking poor craftsmanship. Mabrikoli screen-vets premium plumbers, electricians, painters, and carpenters to guarantee flawless residential service.
+      </p>
+
+      <!-- Search Box -->
+      <form
+        (submit)="handleSearchSubmit($event)"
+        class="max-w-3xl mx-auto mt-10 bg-white p-2.5 sm:p-4 rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/50 flex flex-col sm:flex-row gap-2"
+      >
+        <div class="flex-1 flex items-center space-x-2 px-3">
+          <svg lucideSearch class="h-5 w-5 text-slate-400 shrink-0"></svg>
+          <input
+            type="text"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            name="searchQuery"
+            placeholder="What service do you need? (e.g. Plumbing, Electrician...)"
+            class="w-full focus:outline-none text-slate-800 placeholder-slate-400 text-sm border-none bg-transparent"
+          />
+        </div>
+        
+        <div class="h-px bg-slate-100 sm:h-8 sm:w-px my-1 sm:my-0 self-stretch"></div>
+
+        <div class="w-full sm:w-56 flex items-center space-x-2 px-3">
+          <svg lucideMapPin class="h-5 w-5 text-slate-400 shrink-0"></svg>
+          <select
+            [ngModel]="cityQuery()"
+            (ngModelChange)="cityQuery.set($event)"
+            name="cityQuery"
+            class="w-full focus:outline-none text-slate-700 text-sm border-none bg-transparent"
+          >
+            <option value="">All Cities</option>
+            <option value="Casablanca">Casablanca</option>
+            <option value="Rabat">Rabat</option>
+            <option value="Marrakech">Marrakech</option>
+            <option value="Tangier">Tangier</option>
+            <option value="Fes">Fes</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm px-6 py-3.5 rounded-2xl shadow-lg shadow-blue-100 transition cursor-pointer"
+        >
+          Search Professionals
+        </button>
+      </form>
+
+      <!-- Quick links tag cloud -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mt-6 text-xs text-slate-400">
+        <span class="font-semibold">Popular categories:</span>
+        @for (cat of categories().slice(0, 4); track cat.id) {
+          <button
+            (click)="navigateToCategory(cat.name)"
+            class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-full font-bold transition"
+          >
+            {{ cat.name }}
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. POPULAR CATEGORIES -->
+  <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <h2 class="text-3xl font-black text-slate-900 tracking-tight">Explore Certified Categories</h2>
+      <p class="text-slate-500 text-sm mt-3">
+        Every specialist listed within these categories has been certified by our admin team before publication.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (cat of categories(); track cat.id) {
+        <div
+          (click)="navigateToCategory(cat.name)"
+          class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex items-start space-x-5 hover:shadow-md hover:border-slate-200 transition duration-300 cursor-pointer group"
+        >
+          <div class="p-3.5 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+            @if (cat.name === 'Plumber') {
+              <svg lucideDroplet class="h-6 w-6"></svg>
+            } @else if (cat.name === 'Electrician') {
+              <svg lucideZap class="h-6 w-6"></svg>
+            } @else if (cat.name === 'Painter') {
+              <svg lucidePaintbrush class="h-6 w-6"></svg>
+            } @else if (cat.name === 'Gardener') {
+              <svg lucideFlower2 class="h-6 w-6"></svg>
+            } @else if (cat.name === 'Locksmith') {
+              <svg lucideKey class="h-6 w-6"></svg>
+            } @else if (cat.name === 'Cleaner') {
+              <svg lucideSparkles class="h-6 w-6"></svg>
+            } @else {
+              <svg lucideHammer class="h-6 w-6"></svg>
+            }
+          </div>
+          <div class="text-left overflow-hidden">
+            <h3 class="font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors">{{ cat.name }}</h3>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">{{ cat.description }}</p>
+            <span class="inline-flex items-center text-[10px] font-bold text-blue-600 mt-2 hover:underline">
+              <span>View Active Professionals</span>
+              <svg lucideArrowRight class="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform"></svg>
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 3. HOW IT WORKS -->
+  <section class="py-20 bg-white border-y border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="max-w-3xl mx-auto mb-14">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Streamlined Vetting Flow</span>
+        <h2 class="text-3xl font-black text-slate-900 tracking-tight mt-3">How Mabrikoli Works</h2>
+        <p class="text-slate-500 text-sm mt-3 leading-relaxed">
+          We ensure flawless connections between demanding clients and certified artisans through a rigorous manual review procedure.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        <div class="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-dashed bg-slate-100 -translate-y-1/2 hidden md:block z-0"></div>
+        
+        <!-- Step 1 -->
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="h-14 w-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xl shadow-inner mb-4">
+            1
+          </div>
+          <h3 class="font-extrabold text-slate-950 text-base">Vetting Application</h3>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed max-w-xs">
+            Artisans registers and uploads valid identity cards, registration diplomas, proof of company registry, and recent project references.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="h-14 w-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-xl shadow-inner mb-4">
+            2
+          </div>
+          <h3 class="font-extrabold text-slate-950 text-base">Administrative Review</h3>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed max-w-xs">
+            The Mabrikoli Admin board manually checks certificates, checks criminal status, and validates documents before granting Approved badge.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="h-14 w-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xl shadow-inner mb-4">
+            3
+          </div>
+          <h3 class="font-extrabold text-slate-950 text-base">Seamless Booking</h3>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed max-w-xs">
+            Only approved and verified artisans appear in search results. Clients find, schedule and book vetted professionals safely.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. STATISTICS -->
+  <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-slate-900 rounded-[40px] text-white p-10 md:p-16 relative overflow-hidden shadow-2xl">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--color-blue-900),transparent_40%)] opacity-80"></div>
+      
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-5 text-left space-y-4">
+          <span class="text-xs text-blue-400 font-extrabold uppercase tracking-widest block">Safe Market Operations</span>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight">Morocco’s Leading Vetted Professional Network</h2>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            By maintaining a high standard, we ensure zero low-quality listings. We prioritize precision over massive lists.
+          </p>
+        </div>
+
+        <div class="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="p-5 rounded-3xl bg-slate-800/60 border border-slate-800 text-center">
+            <span class="font-black text-3xl text-blue-400 block">100%</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-1">Manual Vetting</span>
+          </div>
+          <div class="p-5 rounded-3xl bg-slate-800/60 border border-slate-800 text-center">
+            <span class="font-black text-3xl text-emerald-400 block">1,800+</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-1">Vetted Projects</span>
+          </div>
+          <div class="p-5 rounded-3xl bg-slate-800/60 border border-slate-800 text-center">
+            <span class="font-black text-3xl text-amber-400 block">4.9/5</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-1">Average Rating</span>
+          </div>
+          <div class="p-5 rounded-3xl bg-slate-800/60 border border-slate-800 text-center">
+            <span class="font-black text-3xl text-white block">0</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-1">Fake Profiles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. FEATURED ARTISANS -->
+  <section class="py-20 bg-white border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
+        <div class="text-left">
+          <span class="text-xs font-extrabold text-blue-600 uppercase tracking-wider block">Verified Profiles</span>
+          <h2 class="text-3xl font-black text-slate-900 tracking-tight mt-2">Certified Specialists</h2>
+          <p class="text-slate-500 text-xs mt-1">
+            Highest-rated master professionals active this week.
+          </p>
+        </div>
+
+        <button
+          (click)="navigateToSearch()"
+          class="text-sm font-extrabold text-blue-600 flex items-center space-x-1.5 hover:underline mt-4 sm:mt-0 transition cursor-pointer"
+        >
+          <span>Explore all vetted artisans</span>
+          <svg lucideArrowRight class="h-4 w-4"></svg>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        @for (art of featuredArtisans(); track art.id) {
+          <app-artisan-card [artisan]="art"></app-artisan-card>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. TESTIMONIALS -->
+  <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <h2 class="text-3xl font-black text-slate-900 tracking-tight">Our Customers Speak</h2>
+      <p class="text-slate-500 text-sm mt-3">
+        Real feedback from verified homeowners and property managers.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex text-amber-400">
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed italic">
+            "Finding a plumber in Casablanca was always a nightmare. I booked Karim and the difference was incredible. Arrived on time, professional equipment, explained everything clearly. Absolute game-changer!"
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 mt-6">
+          <img
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150"
+            alt="Adnane Filali"
+            class="h-9 w-9 rounded-full object-cover"
+          />
+          <div class="text-left">
+            <h4 class="text-xs font-bold text-slate-800">Adnane Filali</h4>
+            <span class="text-[10px] text-slate-400">Casablanca homeowner</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex text-amber-400">
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed italic">
+            "The artisan registration system is wonderful. As an interior designer, having a verified badge gives clients immediate trust. I received 3 premium project enquiries on my first approved month!"
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 mt-6">
+          <img
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150"
+            alt="Sarah Benziane"
+            class="h-9 w-9 rounded-full object-cover"
+          />
+          <div class="text-left">
+            <h4 class="text-xs font-bold text-slate-800">Sarah Benziane</h4>
+            <span class="text-[10px] text-slate-400">Interior Designer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex text-amber-400">
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+            <svg lucideStar class="h-4 w-4 fill-amber-400"></svg>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed italic">
+            "We managed the electrical rewiring of our entire Agdal apartment using Mabrikoli. Youssef Amrani worked flawlessly, with structural wiring guarantees and safety certification codes. Superb!"
+          </p>
+        </div>
+        <div class="flex items-center space-x-3 mt-6">
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150"
+            alt="Sanaa Loudiyi"
+            class="h-9 w-9 rounded-full object-cover"
+          />
+          <div class="text-left">
+            <h4 class="text-xs font-bold text-slate-800">Sanaa Loudiyi</h4>
+            <span class="text-[10px] text-slate-400">Rabat apartment owner</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FAQ -->
+  <section class="py-20 bg-white border-t border-slate-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-12">
+        <h2 class="text-3xl font-black text-slate-900 tracking-tight">Vetting & Screening FAQ</h2>
+        <p class="text-slate-500 text-sm mt-3">
+          Answers to your security, guarantees, and application questions.
+        </p>
+      </div>
+
+      <app-accordion [items]="faqItems"></app-accordion>
+    </div>
+  </section>
+</div>

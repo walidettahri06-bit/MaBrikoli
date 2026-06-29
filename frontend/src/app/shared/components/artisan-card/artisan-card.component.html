@@ -1,0 +1,119 @@
+<div
+  class="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+  [id]="'artisan-card-' + artisan().id"
+ >
+  <div class="p-6">
+    <!-- Header section with photo, name & favorite button -->
+    <div class="flex items-start justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <img
+            [src]="artisanAvatar"
+            [alt]="artisanName"
+            class="h-16 w-16 rounded-2xl object-cover border-2 border-slate-50 shadow-inner"
+          />
+          @if (artisan().verified) {
+            <span class="absolute -bottom-1 -right-1 bg-blue-600 text-white p-1 rounded-full border-2 border-white flex items-center justify-center shadow-md">
+              <svg lucideShieldCheck class="h-3.5 w-3.5"></svg>
+            </span>
+          }
+        </div>
+
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <h3 (click)="handleViewProfile()" class="text-base font-extrabold text-slate-900 leading-tight hover:text-blue-600 transition cursor-pointer">
+              {{ artisanName }}
+            </h3>
+          </div>
+          <p class="text-xs font-semibold text-slate-500 mt-0.5">{{ profession }}</p>
+
+          <div class="flex items-center space-x-2 mt-1.5">
+            <span [class]="'px-2 py-0.5 text-[10px] font-bold border rounded-full ' + getAvailabilityStyle()">
+              {{ availabilityText }}
+            </span>
+            <span class="text-slate-300 text-xs">•</span>
+            <span class="text-[11px] font-bold text-slate-500 flex items-center space-x-0.5">
+              <svg lucideAward class="h-3.5 w-3.5 text-blue-500"></svg>
+              <span>{{ artisan().yearsOfExperience }} yrs exp</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <button
+        (click)="handleFavoriteClick($event)"
+        [class]="'p-2 rounded-xl border transition ' + (isFav() ? 'bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-100' : 'bg-white border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-rose-50/50')"
+        [id]="'fav-btn-' + artisan().id"
+      >
+        <svg lucideHeart [class]="'h-4.5 w-4.5 ' + (isFav() ? 'fill-rose-500' : '')"></svg>
+      </button>
+    </div>
+
+    <!-- Info row with rating & location -->
+    <div class="grid grid-cols-2 gap-2 my-5 p-3.5 bg-slate-50/70 rounded-2xl border border-slate-50">
+      <div class="text-left">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Local Rating</span>
+        <div class="flex items-center space-x-1 mt-0.5">
+          <svg lucideStar class="h-4 w-4 text-amber-500 fill-amber-500"></svg>
+          <span class="text-sm font-extrabold text-slate-900">{{ artisan().averageRating || 'New' }}</span>
+          @if (artisan().totalReviews > 0) {
+            <span class="text-xs font-semibold text-slate-400">({{ artisan().totalReviews }})</span>
+          }
+        </div>
+      </div>
+      <div class="text-left">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Service Area</span>
+        <span class="text-sm font-extrabold text-slate-800 flex items-center space-x-0.5 mt-0.5">
+          <svg lucideMapPin class="h-3.5 w-3.5 text-slate-400 shrink-0"></svg>
+          <span class="truncate">{{ artisan().city }}</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Bio summary -->
+    <p class="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-4">
+      {{ artisan().bio }}
+    </p>
+
+    <!-- Skills list chips -->
+    <div class="flex flex-wrap gap-1.5 overflow-hidden max-h-12">
+      @for (skill of skills.slice(0, 3); track skill) {
+        <span class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+          {{ skill }}
+        </span>
+      }
+      @if (skills.length > 3) {
+        <span class="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">
+          +{{ skills.length - 3 }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Pricing and Action row -->
+  <div class="border-t border-slate-50 bg-slate-50/40 p-5 flex items-center justify-between">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Hourly Rate</span>
+      <div class="flex items-baseline space-x-1">
+        <span class="text-lg font-black text-slate-900">{{ artisan().hourlyPrice }} MAD</span>
+        <span class="text-xs font-bold text-slate-400">/ hr</span>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <button
+        (click)="handleViewProfile()"
+        class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition cursor-pointer"
+      >
+        Profile
+      </button>
+      <button
+        (click)="handleBookNow($event)"
+        [disabled]="!artisan().available"
+        [class]="'px-4 py-2 text-xs font-extrabold text-white rounded-xl shadow-md transition cursor-pointer flex items-center space-x-1 ' + (!artisan().available ? 'bg-slate-300 text-slate-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100')"
+      >
+        <span>Book Now</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,193 @@
+<div class="space-y-6 text-left" id="admin-dashboard-root">
+  
+  <!-- Greeting and header -->
+  <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-50/20 to-transparent"></div>
+    <div class="relative z-10 space-y-1">
+      <h1 class="text-2xl font-black text-slate-900 tracking-tight">System Control Board</h1>
+      <p class="text-xs text-slate-500">
+        Monitor verified artisan applications, moderate reviews, configure trade categories and inspect active scheduling queues.
+      </p>
+    </div>
+  </div>
+
+  <!-- Metrics widgets -->
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+    <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+      <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+        <svg lucideFolderCheck class="h-5 w-5"></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Pending Vetting</span>
+        <span class="text-xl font-black text-slate-900">{{ pendingApplications().length }} Files</span>
+      </div>
+    </div>
+
+    <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+      <div class="bg-blue-50 p-3 rounded-xl text-blue-600">
+        <svg lucideShieldCheck class="h-5 w-5"></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Active Artisans</span>
+        <span class="text-xl font-black text-slate-900">{{ approvedCount() }} / {{ artisans().length }}</span>
+      </div>
+    </div>
+
+    <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+      <div class="bg-emerald-50 p-3 rounded-xl text-emerald-600">
+        <svg lucideCalendar class="h-5 w-5"></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Total Bookings</span>
+        <span class="text-xl font-black text-slate-900">{{ bookings().length }} Scheduled</span>
+      </div>
+    </div>
+
+    <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+      <div class="bg-purple-50 p-3 rounded-xl text-purple-600">
+        <svg lucideUsers class="h-5 w-5"></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Active Users</span>
+        <span class="text-xl font-black text-slate-900">42 Members</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split layout: Pending Applications list on left, Categories manager on right -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- VETTING QUEUE TABLE -->
+    <div class="lg:col-span-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-50">
+        <div>
+          <h2 class="text-base font-black text-slate-900">Pending Artisan Applications</h2>
+          <p class="text-[10px] text-slate-400">Review files and grant Verified status to publish profiles.</p>
+        </div>
+        
+        <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100 animate-pulse">
+          {{ pendingApplications().length }} Awaiting Vetting
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead>
+            <tr class="border-b border-slate-50 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+              <th class="py-3">Specialist</th>
+              <th class="py-3">Trade Category</th>
+              <th class="py-3">Files</th>
+              <th class="py-3">City</th>
+              <th class="py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50 font-medium text-slate-700">
+            @if (pendingApplications().length === 0) {
+              <tr>
+                <td colSpan="5" class="py-8 text-center text-slate-400 font-normal">
+                  All vetting files have been processed! No pending submissions.
+                </td>
+              </tr>
+            } @else {
+              @for (app of pendingApplications(); track app.id) {
+                <tr class="hover:bg-slate-50/50 transition">
+                  <td class="py-3.5 flex items-center space-x-2.5">
+                    <img [src]="app.personalPhotoUrl || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=' + app.firstName" alt="Avatar" class="h-8 w-8 rounded-lg object-cover" />
+                    <div>
+                      <p class="font-extrabold text-slate-800">{{ app.firstName }} {{ app.lastName }}</p>
+                      <p class="text-[10px] text-slate-400">{{ app.phoneNumber }}</p>
+                    </div>
+                  </td>
+                  <td class="py-3.5">{{ app.category?.name || 'Artisan' }}</td>
+                  <td class="py-3.5">
+                    <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold text-[10px]">
+                      {{ app.documents?.length || 2 }} Files
+                    </span>
+                  </td>
+                  <td class="py-3.5">{{ app.city }}</td>
+                  <td class="py-3.5 text-right">
+                    <button
+                      type="button"
+                      (click)="reviewApplication(app.id)"
+                      class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-[11px] font-extrabold transition cursor-pointer bg-transparent border-none"
+                    >
+                      Review Dossier
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CATEGORIES MANAGEMENT PANEL -->
+    <div class="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4 text-xs text-left">
+      <h3 class="font-extrabold text-slate-900 text-sm pb-2 border-b border-slate-50 flex items-center space-x-1.5">
+        <svg lucidePlus class="h-4.5 w-4.5 text-blue-600"></svg>
+        <span>SaaS Category Configurator</span>
+      </h3>
+
+      @if (successMsg) {
+        <div class="bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-100 text-[11px] font-bold flex items-center space-x-1">
+          <svg lucideCheck class="h-3.5 w-3.5"></svg>
+          <span>{{ successMsg }}</span>
+        </div>
+      }
+
+      <form (submit)="handleAddCategory($event)" class="space-y-3 pt-1">
+        <div class="space-y-1">
+          <label class="font-bold text-slate-700 block">Category Name *</label>
+          <input
+            type="text"
+            required
+            name="newCatName"
+            [(ngModel)]="newCatName"
+            placeholder="e.g. Masonry / Welding"
+            class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 bg-slate-50/50"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label class="font-bold text-slate-700 block">Short Description *</label>
+          <textarea
+            rows="2"
+            required
+            name="newCatDesc"
+            [(ngModel)]="newCatDesc"
+            placeholder="Brief category scope..."
+            class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 bg-slate-50/50 resize-none"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl transition cursor-pointer"
+        >
+          Add New Category
+        </button>
+      </form>
+
+      <!-- List existing categories -->
+      <div class="border-t border-slate-50 pt-3">
+        <span class="font-bold text-[10px] text-slate-400 uppercase tracking-wider block mb-2">Configure Active Listings</span>
+        <div class="space-y-1.5 max-h-40 overflow-y-auto">
+          @for (cat of categories(); track cat.id) {
+            <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="font-bold text-slate-700 truncate">{{ cat.name }}</span>
+              <button
+                type="button"
+                (click)="handleDeleteCategory(cat.id)"
+                class="p-1 rounded text-rose-500 hover:bg-rose-50 transition cursor-pointer bg-transparent border-none"
+              >
+                <svg lucideTrash2 class="h-3.5 w-3.5"></svg>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

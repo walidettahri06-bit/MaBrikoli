@@ -1,0 +1,27 @@
+<div class="space-y-6 text-left" id="client-favs">
+  <div class="space-y-1">
+    <h1 class="text-2xl font-black text-slate-900 tracking-tight">Saved Favorites</h1>
+    <p class="text-xs text-slate-400">Instant access to your verified master artisans in Casablanca and Rabat.</p>
+  </div>
+
+  @if (favoriteArtisans().length === 0) {
+    <div class="bg-white p-16 text-center rounded-[32px] border border-slate-100 shadow-sm space-y-4">
+      <svg lucideHeart class="h-10 w-10 text-slate-300 mx-auto"></svg>
+      <h3 class="font-extrabold text-slate-800 text-sm">No Saved Favorites</h3>
+      <p class="text-xs text-slate-400 max-w-xs mx-auto">Explore the verified lists and click the heart on top profiles.</p>
+      <button
+        type="button"
+        (click)="navigateToSearch()"
+        class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-200 transition cursor-pointer border-none"
+      >
+        Find Artisans Now
+      </button>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (art of favoriteArtisans(); track art.id) {
+        <app-artisan-card [artisan]="art"></app-artisan-card>
+      }
+    </div>
+  }
+</div>

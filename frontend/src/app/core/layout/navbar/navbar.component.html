@@ -1,0 +1,258 @@
+<nav class="sticky top-0 z-50 bg-white border-b border-slate-100" id="mabrikoli-navbar">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <!-- Logo Section -->
+      <div class="flex items-center">
+        <button
+          (click)="navigateTo('')"
+          class="flex items-center space-x-2 text-blue-600 font-bold text-2xl tracking-tight transition cursor-pointer"
+          id="nav-logo"
+        >
+          <div class="bg-blue-600 text-white p-1.5 rounded-lg flex items-center justify-center shadow-md shadow-blue-200">
+            <svg lucideSparkles class="h-5 w-5"></svg>
+          </div>
+          <span class="text-slate-900 font-extrabold">Mabri<span class="text-blue-600">koli</span></span>
+        </button>
+
+        <!-- Public Links -->
+        @if (activeRole === 'Public') {
+          <div class="hidden md:flex ml-10 space-x-8">
+            <button
+              (click)="navigateTo('about')"
+              [class]="'text-sm font-medium transition cursor-pointer ' + (currentViewPath === '/about' ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900')"
+            >
+              About
+            </button>
+            <button
+              (click)="navigateTo('faq')"
+              [class]="'text-sm font-medium transition cursor-pointer ' + (currentViewPath === '/faq' ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900')"
+            >
+              FAQ
+            </button>
+            <button
+              (click)="navigateTo('contact')"
+              [class]="'text-sm font-medium transition cursor-pointer ' + (currentViewPath === '/contact' ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900')"
+            >
+              Contact
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Right Controls -->
+      <div class="flex items-center space-x-4 font-semibold">
+        <!-- If Logged In -->
+        @if (currentUser) {
+          <!-- Notifications Bell -->
+          <div class="relative">
+            <button
+              (click)="handleNotificationClick()"
+              class="p-1.5 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition relative cursor-pointer"
+              id="nav-bell"
+            >
+              <svg lucideBell class="h-5 w-5"></svg>
+              @if (unreadNotifications.length > 0) {
+                <span class="absolute top-1 right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                  {{ unreadNotifications.length }}
+                </span>
+              }
+            </button>
+
+            @if (showNotifications()) {
+              <div class="fixed inset-0 z-10" (click)="showNotifications.set(false)"></div>
+              <div
+                class="absolute right-0 mt-2 w-80 rounded-xl bg-white shadow-xl border border-slate-100 overflow-hidden z-20"
+              >
+                <div class="px-4 py-3 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                  <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Notifications</span>
+                  @if (unreadNotifications.length > 0) {
+                    <span class="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold">
+                      {{ unreadNotifications.length }} New
+                    </span>
+                  }
+                </div>
+                <div class="max-h-72 overflow-y-auto divide-y divide-slate-50">
+                  @if (notifications.length === 0) {
+                    <div class="py-8 text-center text-xs text-slate-400">
+                      No notifications yet.
+                    </div>
+                  } @else {
+                    @for (n of notifications; track n.id) {
+                      @if (n.role === activeRole) {
+                        <div [class]="'p-3.5 text-xs transition ' + (n.read ? 'bg-white text-slate-600' : 'bg-blue-50/20 text-slate-800 font-medium')">
+                          <div class="flex justify-between items-start mb-1">
+                            <span class="font-bold">{{ n.title }}</span>
+                            <span class="text-[9px] text-slate-400">{{ n.date }}</span>
+                          </div>
+                          <p class="text-slate-500 leading-normal text-[11px]">{{ n.description }}</p>
+                        </div>
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Profile Dropdown -->
+          <div class="relative">
+            <button
+              (click)="showProfileMenu.set(!showProfileMenu())"
+              class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-slate-50 transition cursor-pointer"
+              id="nav-profile-btn"
+            >
+              <img
+                [src]="currentUser.avatar"
+                [alt]="currentUser.name"
+                class="h-8 w-8 rounded-full object-cover border border-slate-100"
+              />
+              <span class="hidden sm:inline text-sm font-semibold text-slate-800">{{ currentUser.firstName }}</span>
+              <svg lucideChevronDown class="h-4 w-4 text-slate-500 hidden sm:inline"></svg>
+            </button>
+
+            @if (showProfileMenu()) {
+              <div class="fixed inset-0 z-10" (click)="showProfileMenu.set(false)"></div>
+              <div
+                class="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl border border-slate-100 py-1.5 z-20 text-slate-700"
+              >
+                <div class="px-4 py-2 border-b border-slate-50">
+                  <p class="text-xs text-slate-400">Signed in as</p>
+                  <p class="text-sm font-semibold text-slate-800 truncate">{{ currentUser.email }}</p>
+                </div>
+                <button
+                  (click)="showProfileMenu.set(false); navigateTo(getDashboardView())"
+                  class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center space-x-2 transition"
+                >
+                  <svg lucideLayoutDashboard class="h-4 w-4 text-slate-400"></svg>
+                  <span>My Dashboard</span>
+                </button>
+                @if (activeRole === 'Client') {
+                  <button
+                    (click)="showProfileMenu.set(false); navigateTo('client/favorites')"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center space-x-2 transition"
+                  >
+                    <svg lucideHeart class="h-4 w-4 text-slate-400"></svg>
+                    <span>Favorites</span>
+                  </button>
+                  <button
+                    (click)="showProfileMenu.set(false); navigateTo('client/bookings')"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center space-x-2 transition"
+                  >
+                    <svg lucideCalendar class="h-4 w-4 text-slate-400"></svg>
+                    <span>My Bookings</span>
+                  </button>
+                }
+                <div class="border-t border-slate-50 my-1"></div>
+                <button
+                  (click)="showProfileMenu.set(false); authService.logout()"
+                  class="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600 flex items-center space-x-2 transition"
+                >
+                  <svg lucideLogOut class="h-4 w-4"></svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="hidden md:flex items-center space-x-3">
+            <button
+              (click)="navigateTo('login')"
+              class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition cursor-pointer"
+            >
+              Login
+            </button>
+            <button
+              (click)="navigateTo('register/client')"
+              class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-100 cursor-pointer"
+            >
+              Join as Client
+            </button>
+            <button
+              (click)="navigateTo('register/artisan')"
+              class="px-4 py-2 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition cursor-pointer"
+            >
+              Join as Artisan
+            </button>
+          </div>
+        }
+
+        <!-- Mobile Menu Toggle -->
+        <div class="flex md:hidden">
+          <button
+            (click)="mobileMenuOpen.set(!mobileMenuOpen())"
+            class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+          >
+            @if (mobileMenuOpen()) {
+              <svg lucideX class="h-6 w-6"></svg>
+            } @else {
+              <svg lucideMenu class="h-6 w-6"></svg>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Drawer -->
+  @if (mobileMenuOpen()) {
+    <div class="md:hidden border-t border-slate-100 bg-white">
+      <div class="px-4 pt-2 pb-4 space-y-1">
+        @if (activeRole === 'Public') {
+          <button
+            (click)="navigateTo('about')"
+            class="block w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50"
+          >
+            About Us
+          </button>
+          <button
+            (click)="navigateTo('faq')"
+            class="block w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50"
+          >
+            FAQ
+          </button>
+          <button
+            (click)="navigateTo('contact')"
+            class="block w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Contact
+          </button>
+          <div class="border-t border-slate-100 my-2 pt-2"></div>
+          <button
+            (click)="navigateTo('login')"
+            class="block w-full text-center px-3 py-2.5 rounded-lg text-base font-semibold text-slate-700 bg-slate-50"
+          >
+            Login
+          </button>
+          <button
+            (click)="navigateTo('register/client')"
+            class="block w-full text-center px-3 py-2.5 mt-2 rounded-lg text-base font-semibold text-white bg-blue-600"
+          >
+            Register as Client
+          </button>
+          <button
+            (click)="navigateTo('register/artisan')"
+            class="block w-full text-center px-3 py-2.5 mt-2 rounded-lg text-base font-semibold text-slate-700 border border-slate-200"
+          >
+            Register as Artisan
+          </button>
+        } @else {
+          <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase">
+            Navigation
+          </div>
+          <button
+            (click)="navigateTo(getDashboardView())"
+            class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Dashboard
+          </button>
+          <button
+            (click)="navigateTo('logout')"
+            class="block w-full text-left px-3 py-2.5 mt-4 rounded-lg text-base font-semibold text-red-600 bg-red-50"
+          >
+            Logout
+          </button>
+        }
+      </div>
+    </div>
+  }
+</nav>

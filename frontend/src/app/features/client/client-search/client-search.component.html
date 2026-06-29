@@ -1,0 +1,189 @@
+<div class="space-y-6 text-left" id="client-search-root">
+  
+  <!-- 1. Header and search input bar -->
+  <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+    <div class="space-y-1">
+      <h1 class="text-2xl font-black text-slate-900 tracking-tight">Vetted Artisan Directory</h1>
+      <p class="text-xs text-slate-400">
+        Only fully verified, insured and vetted independent specialists appear in our Casablanca and Rabat search lists.
+      </p>
+    </div>
+
+    <!-- Input cluster -->
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex-1 relative">
+        <svg lucideSearch class="absolute left-3 top-3.5 h-4.5 w-4.5 text-slate-400"></svg>
+        <input
+          type="text"
+          name="searchQuery"
+          [(ngModel)]="searchQuery"
+          placeholder="Search by name, skills or tools (e.g. pipe sealing, dimmer spots...)"
+          class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs text-slate-800 bg-slate-50/50"
+        />
+      </div>
+
+      <div class="w-full sm:w-48 relative">
+        <svg lucideMapPin class="absolute left-3 top-3.5 h-4.5 w-4.5 text-slate-400"></svg>
+        <select
+          name="selectedCity"
+          [(ngModel)]="selectedCity"
+          class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs text-slate-700 bg-slate-50/50 appearance-none"
+        >
+          <option value="">All Cities</option>
+          <option value="Casablanca">Casablanca</option>
+          <option value="Rabat">Rabat</option>
+          <option value="Marrakech">Marrakech</option>
+          <option value="Tangier">Tangier</option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        (click)="toggleFiltersMobile()"
+        class="sm:hidden px-4 py-3 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center justify-center space-x-1.5 hover:bg-slate-50 cursor-pointer"
+      >
+        <svg lucideSlidersHorizontal class="h-4.5 w-4.5"></svg>
+        <span>Filters</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Main layout grid with filters on left, results on right -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- FILTERS SIDEBAR -->
+    <div [class]="'lg:col-span-3 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 text-left ' + (showFiltersMobile ? 'block' : 'hidden lg:block')">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <h3 class="font-extrabold text-slate-900 text-sm flex items-center space-x-1.5">
+          <svg lucideSlidersHorizontal class="h-4 w-4 text-blue-600"></svg>
+          <span>Advanced Filters</span>
+        </h3>
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-[11px] font-bold text-slate-400 hover:text-blue-600 transition cursor-pointer bg-transparent border-none"
+        >
+          Clear All
+        </button>
+      </div>
+
+      <!-- Trade Category Filter -->
+      <div class="space-y-2 text-xs">
+        <span class="font-bold text-slate-700 block">Trade Category</span>
+        <select
+          name="selectedCategory"
+          [(ngModel)]="selectedCategory"
+          class="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs text-slate-800 bg-slate-50/50"
+        >
+          <option value="">All Categories</option>
+          @for (cat of categories(); track cat.id) {
+            <option [value]="cat.name">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Hourly Rate Limit -->
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between font-bold text-slate-700">
+          <span>Max Hourly Price</span>
+          <span class="text-blue-600">{{ maxPrice }} MAD/hr</span>
+        </div>
+        <input
+          type="range"
+          min="100"
+          max="500"
+          step="20"
+          name="maxPrice"
+          [(ngModel)]="maxPrice"
+          class="w-full accent-blue-600"
+        />
+        <div class="flex justify-between text-[10px] text-slate-400 font-bold">
+          <span>100 MAD</span>
+          <span>500 MAD</span>
+        </div>
+      </div>
+
+      <!-- Star Rating Filter -->
+      <div class="space-y-2 text-xs">
+        <span class="font-bold text-slate-700 block">Minimum Rating</span>
+        <div class="flex space-x-1">
+          @for (stars of [0, 3.5, 4, 4.5, 4.8]; track stars) {
+            <button
+              type="button"
+              (click)="minRating = stars"
+              [class]="'flex-1 py-1.5 rounded-lg border text-[10px] font-bold transition flex items-center justify-center space-x-0.5 cursor-pointer ' + (minRating === stars ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50')"
+            >
+              <svg lucideStar [class]="'h-3 w-3 ' + (minRating === stars ? 'fill-amber-500 text-amber-500' : 'text-slate-400')"></svg>
+              <span>{{ stars === 0 ? 'Any' : stars + '+' }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Availability Toggle -->
+      <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-50">
+        <div>
+          <span class="text-xs font-bold text-slate-700 block">Only Available Now</span>
+          <span class="text-[10px] text-slate-400">Exclude busy specialists</span>
+        </div>
+        <button
+          type="button"
+          (click)="toggleOnlyAvailable()"
+          [class]="'h-5 w-9 rounded-full transition-colors relative cursor-pointer ' + (onlyAvailable ? 'bg-blue-600' : 'bg-slate-300')"
+        >
+          <span [class]="'absolute top-0.5 left-0.5 h-4 w-4 bg-white rounded-full shadow-md transition-transform duration-200 ' + (onlyAvailable ? 'translate-x-4' : '')"></span>
+        </button>
+      </div>
+
+      <!-- Casablanca Vetting Limits -->
+      <div class="p-4 bg-blue-50/50 rounded-2xl border border-blue-50/20 text-xs">
+        <div class="flex items-center space-x-1 text-blue-800 font-bold mb-1">
+          <svg lucideSparkles class="h-3.5 w-3.5 text-blue-500"></svg>
+          <span>Casablanca Vetting Limits</span>
+        </div>
+        <p class="text-slate-500 text-[10px] leading-relaxed">
+          We focus on premium cities to guarantee manual screening quality. Expanded regions coming soon!
+        </p>
+      </div>
+    </div>
+
+    <!-- RESULTS GRID -->
+    <div class="lg:col-span-9 space-y-4 text-left">
+      <div class="flex justify-between items-center text-xs text-slate-400 font-bold">
+        <p>Showing {{ filteredArtisans.length }} verified artisans</p>
+        <div class="flex items-center space-x-1.5">
+          <span>Sorted by:</span>
+          <span class="text-slate-700">Rating & Relevance</span>
+        </div>
+      </div>
+
+      @if (filteredArtisans.length === 0) {
+        <div class="bg-white border border-slate-100 rounded-[32px] p-16 text-center space-y-4 shadow-sm">
+          <div class="h-16 w-16 rounded-3xl bg-slate-50 text-slate-300 flex items-center justify-center mx-auto shadow-inner">
+            <svg lucideSearch class="h-8 w-8"></svg>
+          </div>
+          <div class="space-y-1 max-w-sm mx-auto">
+            <h3 class="text-lg font-extrabold text-slate-800">No Vetted Artisans Match</h3>
+            <p class="text-xs text-slate-400 leading-normal">
+              We currently have no verified specialists matching those filters. Try reducing the rate limit or resetting your search term.
+            </p>
+          </div>
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-100 transition cursor-pointer"
+          >
+            Reset Filter Settings
+          </button>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          @for (art of filteredArtisans; track art.id) {
+            <app-artisan-card [artisan]="art"></app-artisan-card>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,247 @@
+<div class="space-y-6 text-left" id="artisan-dashboard-root">
+  
+  @if (!isArtisanRole()) {
+    <!-- CASE: PENDING APPLICATION DISPLAY -->
+    @if (applications().length > 0) {
+      @let app = applications()[0];
+      <div class="space-y-6">
+        <div class="space-y-1">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Application Vetting Status</h1>
+          <p class="text-xs text-slate-400">Review civil liability and credential clearance reports from Mabrikoli board.</p>
+        </div>
+
+        <div class="p-6 sm:p-8 rounded-[32px] border bg-amber-50 border-amber-100 text-amber-700 shadow-sm space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center space-x-4">
+              <div class="p-3 bg-white rounded-2xl shadow-inner text-amber-600">
+                <svg lucideFolderCheck class="h-7 w-7"></svg>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Submission Status</span>
+                <h2 class="text-lg font-black text-amber-800">PENDING ADMIN VETTING</h2>
+                <p class="text-[10px] text-slate-400 mt-0.5">Submitted: {{ app.createdAt | date:'shortDate' }}</p>
+              </div>
+            </div>
+
+            <span class="px-3 py-1 bg-white border rounded-full text-xs font-black text-amber-700">
+              {{ app.status }}
+            </span>
+          </div>
+
+          <div class="bg-white/80 p-4 rounded-2xl text-xs text-slate-600 leading-relaxed border border-white">
+            <p>
+              Your documents are under active manual verification. Our administrators check company registration files, technical diplomas, and liability coverage. Vetting takes an average of 24-48 business hours. You will receive an automated notification once cleared.
+            </p>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <h3 class="font-bold text-slate-900 text-xs">Vetting Documents Audit</h3>
+            <div class="space-y-2">
+              <div class="p-3 bg-white/70 rounded-xl border border-white flex justify-between items-center text-xs">
+                <div>
+                  <span class="font-bold text-slate-800 block truncate">National ID.pdf</span>
+                  <span class="text-[10px] text-slate-400">Identification • 1.1 MB</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-100">
+                  PENDING
+                </span>
+              </div>
+              <div class="p-3 bg-white/70 rounded-xl border border-white flex justify-between items-center text-xs">
+                <div>
+                  <span class="font-bold text-slate-800 block truncate">Professional License.pdf</span>
+                  <span class="text-[10px] text-slate-400">Trade Diploma • 2.5 MB</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-100">
+                  PENDING
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- CASE: NO APPLICATION YET -->
+      <div class="bg-white border border-slate-100 rounded-[32px] p-16 text-center space-y-4 shadow-sm">
+        <div class="h-16 w-16 rounded-3xl bg-slate-50 text-slate-300 flex items-center justify-center mx-auto shadow-inner">
+          <svg lucideFolderCheck class="h-8 w-8"></svg>
+        </div>
+        <div class="space-y-1 max-w-sm mx-auto">
+          <h3 class="text-lg font-extrabold text-slate-800">Become an Approved Artisan</h3>
+          <p class="text-xs text-slate-400 leading-normal">
+            To display your services on the public directory, list your hourly price and upload trade qualifications for screening.
+          </p>
+        </div>
+        <button
+          type="button"
+          (click)="router.navigate(['/register/artisan'])"
+          class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-100 transition cursor-pointer"
+        >
+          Submit Vetting Application
+        </button>
+      </div>
+    }
+  } @else {
+    @let art = artisanProfile();
+    @if (art) {
+      <!-- CASE: APPROVED ARTISAN DASHBOARD -->
+      <!-- Header greeting & availability selector -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/20 to-transparent"></div>
+        <div class="relative z-10 space-y-1">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Bonjour, {{ art.firstName }}!</h1>
+          <p class="text-xs text-slate-500">
+            Control your calendar slots, review incoming plumbing or cabinetry booking requests, and view vetting documents.
+          </p>
+        </div>
+
+        <!-- AVAILABILITY DROPDOWN - Interactive -->
+        <div class="relative z-10 flex items-center space-x-2 bg-slate-50 border border-slate-200 p-2.5 rounded-2xl">
+          <span class="text-xs font-bold text-slate-600">Availability:</span>
+          <select
+            [ngModel]="art.available"
+            (ngModelChange)="handleAvailabilityChange($event)"
+            class="text-xs font-extrabold text-blue-700 focus:outline-none bg-transparent cursor-pointer border-none"
+          >
+            <option [ngValue]="true">Available</option>
+            <option [ngValue]="false">Busy</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stats cluster widgets -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+          <div class="bg-blue-50 p-3 rounded-xl text-blue-600">
+            <svg lucideCreditCard class="h-5 w-5"></svg>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Total Earnings</span>
+            <span class="text-xl font-black text-slate-900">{{ totalEarnings() }} MAD</span>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+          <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+            <svg lucideCalendar class="h-5 w-5"></svg>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Requests Pending</span>
+            <span class="text-xl font-black text-slate-900">{{ pendingBookings().length }} Requests</span>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+          <div class="bg-emerald-50 p-3 rounded-xl text-emerald-600">
+            <svg lucideCheckCircle class="h-5 w-5"></svg>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Completed Jobs</span>
+            <span class="text-xl font-black text-slate-900">{{ completedCount() }} Jobs</span>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-3.5">
+          <div class="bg-purple-50 p-3 rounded-xl text-purple-600">
+            <svg lucideStar class="h-5 w-5 text-amber-500 fill-amber-500"></svg>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Average Score</span>
+            <span class="text-xl font-black text-slate-900">{{ art.averageRating || 'New' }} ({{ art.totalReviews }})</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main split: Bookings & Reviews -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Active/Pending requests -->
+        <div class="lg:col-span-8 space-y-4">
+          <h2 class="text-lg font-black text-slate-900">Incoming & Active Bookings ({{ pendingBookings().length + activeBookings().length }})</h2>
+          
+          <div class="space-y-4">
+            @if (pendingBookings().length === 0 && activeBookings().length === 0) {
+              <div class="bg-white border border-slate-100 rounded-3xl p-12 text-center space-y-3.5 shadow-sm">
+                <svg lucideCalendar class="h-8 w-8 text-slate-300 mx-auto animate-pulse"></svg>
+                <h3 class="text-sm font-bold text-slate-800">No active bookings scheduled</h3>
+                <p class="text-xs text-slate-400 max-w-xs mx-auto">
+                  When homeowners request services in your primary category, they will show up here. Keep calendar slots available!
+                </p>
+              </div>
+            } @else {
+              @for (bk of pendingBookings(); track bk.id) {
+                <app-booking-card [booking]="bk" (statusChanged)="loadData()"></app-booking-card>
+              }
+              @for (bk of activeBookings(); track bk.id) {
+                <app-booking-card [booking]="bk" (statusChanged)="loadData()"></app-booking-card>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Right: Vetting scorecard & recent comments -->
+        <div class="lg:col-span-4 space-y-6">
+          
+          <!-- Recent Reviews Preview -->
+          <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-xs space-y-4 text-left">
+            <h3 class="font-extrabold text-slate-950 text-sm pb-2 border-b border-slate-50 flex items-center space-x-1">
+              <svg lucideStar class="h-4 w-4 text-amber-400 fill-amber-400"></svg>
+              <span>Recent Client Reviews</span>
+            </h3>
+
+            <div class="space-y-4 divide-y divide-slate-50">
+              @if (reviews().length === 0) {
+                <p class="text-xs text-slate-400 py-3 text-center">No reviews received yet.</p>
+              } @else {
+                @for (r of reviews().slice(0, 3); track r.id) {
+                  <div class="pt-3 first:pt-0 space-y-1.5">
+                    <div class="flex justify-between items-center">
+                      <span class="font-bold text-slate-800">{{ r.clientName }}</span>
+                      <div class="flex text-amber-400">
+                        @for (star of [].constructor(r.rating); track $index) {
+                          <svg lucideStar class="h-3 w-3 fill-amber-400 text-amber-400"></svg>
+                        }
+                      </div>
+                    </div>
+                    <p class="text-slate-500 leading-normal italic text-[11px]">
+                      "{{ r.comment }}"
+                    </p>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Vetting Credentials Checklist -->
+          <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-xs space-y-4 text-left">
+            <h3 class="font-extrabold text-slate-950 text-sm pb-2 border-b border-slate-50 flex items-center space-x-1.5">
+              <svg lucideFolderCheck class="h-4.5 w-4.5 text-blue-600"></svg>
+              <span>My Security Files</span>
+            </h3>
+
+            <div class="space-y-2">
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                <div class="overflow-hidden">
+                  <span class="font-bold text-slate-700 truncate block text-[11px]">National ID.pdf</span>
+                  <span class="text-[9px] text-slate-400">Identification • 1.1 MB</span>
+                </div>
+                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border uppercase tracking-wider bg-emerald-50 text-emerald-700 border-emerald-100">
+                  APPROVED
+                </span>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                <div class="overflow-hidden">
+                  <span class="font-bold text-slate-700 truncate block text-[11px]">Professional License.pdf</span>
+                  <span class="text-[9px] text-slate-400">Trade Diploma • 2.5 MB</span>
+                </div>
+                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border uppercase tracking-wider bg-emerald-50 text-emerald-700 border-emerald-100">
+                  APPROVED
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+  }
+</div>

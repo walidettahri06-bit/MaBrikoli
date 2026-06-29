@@ -1,0 +1,165 @@
+@let user = authService.currentUser();
+@if (user) {
+  <div class="space-y-6 text-left" id="client-dashboard-root">
+    
+    <!-- 1. Header greeting & Action Banner -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-50/20 to-transparent"></div>
+      <div class="relative z-10 space-y-1">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Bonjour, {{ user.firstName }}!</h1>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Manage your booked artisans, view custom verification ratings, and arrange premium home care in Casablanca.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="navigateToSearch()"
+        class="relative z-10 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-2xl shadow-lg shadow-blue-100 transition flex items-center space-x-1.5 cursor-pointer shrink-0"
+      >
+        <svg lucideSearch class="h-4 w-4"></svg>
+        <span>Search Vetted Artisans</span>
+      </button>
+    </div>
+
+    <!-- 2. Key Metrics Widgets -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- Metric 1 -->
+      <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-4">
+        <div class="bg-blue-50 p-3 rounded-xl text-blue-600">
+          <svg lucideCalendar class="h-5 w-5"></svg>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Total Bookings</span>
+          <span class="text-xl font-black text-slate-900">{{ bookings().length }} Scheduled</span>
+        </div>
+      </div>
+
+      <!-- Metric 2 -->
+      <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-4">
+        <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+          <svg lucideCalendar class="h-5 w-5"></svg>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Active Work</span>
+          <span class="text-xl font-black text-slate-900">{{ activeBookings().length }} In Progress</span>
+        </div>
+      </div>
+
+      <!-- Metric 3 -->
+      <div class="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center space-x-4">
+        <div class="bg-rose-50 p-3 rounded-xl text-rose-600">
+          <svg lucideHeart class="h-5 w-5"></svg>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Saved Favorites</span>
+          <span class="text-xl font-black text-slate-900">{{ favoritesCount() }} Professionals</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Main Dashboard grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left column: Active Bookings -->
+      <div class="lg:col-span-8 space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-black text-slate-900">Current Booking Statuses</h2>
+          <button
+            type="button"
+            (click)="navigateToBookings()"
+            class="text-xs font-bold text-blue-600 hover:underline cursor-pointer bg-transparent border-none"
+          >
+            Full History
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          @if (activeBookings().length === 0) {
+            <div class="bg-white border border-slate-100 rounded-3xl p-10 text-center space-y-4 shadow-sm">
+              <div class="h-12 w-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
+                <svg lucideCalendar class="h-6 w-6"></svg>
+              </div>
+              <div class="space-y-1 max-w-xs mx-auto">
+                <h3 class="text-sm font-bold text-slate-800">No active bookings</h3>
+                <p class="text-xs text-slate-400 leading-normal">
+                  You have no pending or confirmed artisan appointments scheduled.
+                </p>
+              </div>
+              <button
+                type="button"
+                (click)="navigateToSearch()"
+                class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                Book your first service
+              </button>
+            </div>
+          } @else {
+            @for (bk of activeBookings(); track bk.id) {
+              <app-booking-card [booking]="bk" (statusChanged)="loadDashboardData()"></app-booking-card>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Right column: Favorite Artisans list preview & Safety Check -->
+      <div class="lg:col-span-4 space-y-6">
+        
+        <!-- Favorites shortlist -->
+        <div class="space-y-3.5 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-left">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-50">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center space-x-1">
+              <svg lucideHeart class="h-4 w-4 text-rose-500 fill-rose-500"></svg>
+              <span>My Favorites</span>
+            </h3>
+            <button
+              type="button"
+              (click)="navigateToSearch()"
+              class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer bg-transparent border-none"
+            >
+              View ({{ favoritesCount() }})
+            </button>
+          </div>
+
+          <div class="divide-y divide-slate-50">
+            @if (favoriteArtisans().length === 0) {
+              <p class="text-xs text-slate-400 py-4 text-center">Your favorite artisans will appear here.</p>
+            } @else {
+              @for (art of favoriteArtisans().slice(0, 3); track art.id) {
+                <div
+                  (click)="navigateToArtisanDetails(art.id)"
+                  class="py-3 flex items-center justify-between cursor-pointer group first:pt-0"
+                >
+                  <div class="flex items-center space-x-2.5 overflow-hidden">
+                    <img [src]="art.profilePhoto || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=' + art.firstName" alt="Artisan Avatar" class="h-8 w-8 rounded-lg object-cover" />
+                    <div class="overflow-hidden">
+                      <h4 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition truncate">{{ art.firstName }} {{ art.lastName }}</h4>
+                      <p class="text-[10px] text-slate-400 truncate">{{ art.categories[0]?.name || 'Artisan' }}</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+                    {{ art.hourlyPrice }} MAD/hr
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Vetting Guarantee Block -->
+        <div class="p-5 bg-gradient-to-br from-slate-900 to-slate-950 rounded-3xl text-white space-y-4 shadow-xl border border-slate-800 text-left relative overflow-hidden">
+          <div class="absolute -bottom-12 -right-12 h-32 w-32 bg-blue-600/15 rounded-full blur-2xl"></div>
+          
+          <div class="flex items-center space-x-2 text-blue-400 font-bold text-xs">
+            <svg lucideShieldCheck class="h-4.5 w-4.5"></svg>
+            <span>Vetted Quality Shield</span>
+          </div>
+          
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Mabrikoli reviews state IDs, criminal records, and professional guilds licenses for every artisan before we issue active profile verification.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

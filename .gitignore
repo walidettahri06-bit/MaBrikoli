@@ -1,0 +1,37 @@
+# === Java / Maven ===
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+
+# === IDE ===
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*.swo
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Angular / Node ===
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# === Environment & Secrets ===
+.env
+.env.local
+*.log
+
+# === Gemini / AI agent ===
+.gemini/
+.agents/

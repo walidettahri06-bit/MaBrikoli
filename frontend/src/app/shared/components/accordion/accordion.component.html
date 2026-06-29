@@ -1,0 +1,21 @@
+<div class="space-y-3">
+  @for (item of items(); track $index) {
+    <div class="border border-slate-100 rounded-2xl bg-white overflow-hidden shadow-sm transition hover:shadow-md">
+      <button
+        (click)="toggle($index)"
+        class="w-full flex items-center justify-between p-5 text-left text-sm font-extrabold text-slate-800 hover:bg-slate-50/50 transition cursor-pointer"
+      >
+        <span>{{ item.title }}</span>
+        <div [class]="'p-1.5 rounded-lg border border-slate-100 bg-white transition-transform ' + (openIndex() === $index ? 'rotate-180 text-blue-600' : 'text-slate-400')">
+          <svg lucideChevronDown class="h-4 w-4"></svg>
+        </div>
+      </button>
+
+      @if (openIndex() === $index) {
+        <div class="p-5 pt-0 text-xs text-slate-500 leading-relaxed border-t border-slate-50">
+          <p>{{ item.content }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

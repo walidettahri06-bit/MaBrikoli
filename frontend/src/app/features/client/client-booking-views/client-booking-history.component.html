@@ -1,0 +1,26 @@
+<div class="space-y-6 text-left" id="booking-history-root">
+  <div class="space-y-1">
+    <h1 class="text-2xl font-black text-slate-900 tracking-tight">Booking Operations</h1>
+    <p class="text-xs text-slate-400">Track current technician schedules and past service history.</p>
+  </div>
+
+  @if (error) {
+    <div class="bg-red-50 text-red-700 p-3 rounded-xl border border-red-100 text-xs">
+      {{ error }}
+    </div>
+  }
+
+  <div class="space-y-4">
+    @if (bookings().length === 0) {
+      <div class="bg-white p-12 text-center rounded-3xl border border-slate-100 space-y-4 shadow-sm">
+        <svg lucideCalendar class="h-10 w-10 text-slate-300 mx-auto"></svg>
+        <h3 class="font-extrabold text-slate-800 text-sm">No Booking History Found</h3>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto">You have not submitted any reservations on Mabrikoli.</p>
+      </div>
+    } @else {
+      @for (bk of bookings(); track bk.id) {
+        <app-booking-card [booking]="bk" (statusChanged)="loadBookings()"></app-booking-card>
+      }
+    }
+  </div>
+</div>

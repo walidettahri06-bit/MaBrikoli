@@ -1,0 +1,82 @@
+<div class="bg-slate-50 min-h-screen flex items-center justify-center py-20 px-4" id="login-page">
+  <div class="max-w-md w-full bg-white rounded-[32px] border border-slate-100 shadow-xl p-8 space-y-6 text-left relative overflow-hidden">
+    <div class="absolute top-0 left-0 right-0 h-1.5 bg-blue-600"></div>
+    
+    <div class="space-y-2 text-center">
+      <h2 class="text-2xl font-black text-slate-900 tracking-tight">Welcome Back</h2>
+      <p class="text-xs text-slate-400">Sign in to book artisans or check vetting status</p>
+    </div>
+
+
+
+    @if (error) {
+      <div class="bg-red-50 text-red-700 p-3.5 rounded-xl border border-red-100 text-xs flex items-center space-x-2">
+        <svg lucideShieldAlert class="h-4.5 w-4.5 text-red-500 shrink-0"></svg>
+        <span>{{ error }}</span>
+      </div>
+    }
+
+    <form (submit)="onSubmit()" class="space-y-4">
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-700 block">Email Address</label>
+        <div class="relative">
+          <svg lucideMail class="absolute left-3 top-3.5 h-4 w-4 text-slate-400"></svg>
+          <input
+            type="email"
+            required
+            name="email"
+            [(ngModel)]="email"
+            placeholder="walidettahri06@gmail.com"
+            class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs text-slate-800 bg-slate-50/50"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="flex justify-between items-center">
+          <label class="text-xs font-bold text-slate-700 block">Password</label>
+          <button
+            type="button"
+            (click)="navigateToForgot()"
+            class="text-[11px] text-blue-600 hover:underline font-semibold cursor-pointer bg-transparent border-none"
+          >
+            Forgot?
+          </button>
+        </div>
+        <div class="relative">
+          <svg lucideLock class="absolute left-3 top-3.5 h-4 w-4 text-slate-400"></svg>
+          <input
+            type="password"
+            required
+            name="password"
+            [(ngModel)]="password"
+            placeholder="••••••••••••"
+            class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs text-slate-800 bg-slate-50/50"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-2xl shadow-lg shadow-blue-100 transition cursor-pointer text-xs"
+      >
+        Sign In to Account
+      </button>
+    </form>
+
+    <div class="text-center pt-2">
+      <p class="text-xs text-slate-400">
+        Don't have a Client account? 
+        <button (click)="navigateToRegister('client')" class="text-blue-600 hover:underline font-bold cursor-pointer bg-transparent border-none">
+          Join here
+        </button>
+      </p>
+      <p class="text-xs text-slate-400 mt-1">
+        Want to list your services? 
+        <button (click)="navigateToRegister('artisan')" class="text-blue-600 hover:underline font-bold cursor-pointer bg-transparent border-none">
+          Register as Artisan
+        </button>
+      </p>
+    </div>
+  </div>
+</div>

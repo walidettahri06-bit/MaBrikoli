@@ -1,0 +1,126 @@
+@let bk = booking();
+<div
+  (click)="handleCardClick()"
+  [id]="'booking-card-' + bk.id"
+  class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer text-left"
+>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-50 gap-3">
+    <div class="flex items-center space-x-3 text-xs">
+      <div class="bg-slate-100 p-2 rounded-xl text-slate-600">
+        <svg lucideCalendar class="h-4.5 w-4.5"></svg>
+      </div>
+      <div>
+        <p class="font-extrabold text-slate-800">{{ bk.bookingDate }}</p>
+        <p class="text-slate-400 font-semibold flex items-center space-x-1 mt-0.5">
+          <svg lucideClock class="h-3.5 w-3.5 text-slate-300"></svg>
+          <span>{{ bk.preferredTime || '09:00' }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <span [class]="'px-2.5 py-1 text-xs font-bold border rounded-full ' + getStatusStyle()">
+        {{ bk.status }}
+      </span>
+      <span class="text-xs font-semibold text-slate-300">ID: {{ bk.id }}</span>
+    </div>
+  </div>
+
+  <!-- Main Row: Client and Artisan -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+    <!-- Artisan Panel -->
+    <div class="flex items-center space-x-3 text-left">
+      <img
+        src="https://api.dicebear.com/7.x/pixel-art/svg?seed=artisan"
+        alt="Artisan Avatar"
+        class="h-10 w-10 rounded-xl object-cover border border-slate-100"
+      />
+      <div>
+        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Artisan</span>
+        <h4 class="text-sm font-extrabold text-slate-800 leading-tight">{{ bk.artisanName }}</h4>
+        <p class="text-xs font-semibold text-slate-400">{{ bk.categoryName }}</p>
+      </div>
+    </div>
+
+    <!-- Client Panel -->
+    <div class="flex items-center space-x-3 text-left md:border-l md:border-slate-50 md:pl-4">
+      <img
+        src="https://api.dicebear.com/7.x/pixel-art/svg?seed=client"
+        alt="Client Avatar"
+        class="h-10 w-10 rounded-xl object-cover border border-slate-100"
+      />
+      <div>
+        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Customer</span>
+        <h4 class="text-sm font-extrabold text-slate-800 leading-tight">{{ bk.clientName }}</h4>
+        <p class="text-xs font-semibold text-slate-400">Client #{{ bk.clientId }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address & Service Details block -->
+  <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-50/20 text-xs text-slate-600 flex items-start space-x-2 my-2 text-left">
+    <svg lucideMapPin class="h-4 w-4 text-slate-400 shrink-0 mt-0.5"></svg>
+    <span class="line-clamp-1">{{ bk.address }}, {{ bk.city }}</span>
+  </div>
+
+  <!-- Pricing & CTA actions footer -->
+  <div class="flex items-center justify-between pt-4 mt-2 border-t border-slate-50">
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Estimated Cost</span>
+      <span class="text-base font-black text-slate-900">{{ bk.estimatedPrice }} MAD</span>
+    </div>
+
+    <div class="flex items-center space-x-2" (click)="$event.stopPropagation()">
+      <!-- Client-specific interactive triggers -->
+      @if (isClient && bk.status === 'PENDING') {
+        <button
+          type="button"
+          (click)="handleCancel($event)"
+          class="px-3.5 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl border border-rose-100 transition cursor-pointer"
+        >
+          Cancel Request
+        </button>
+      }
+
+      <!-- Artisan-specific interactive triggers -->
+      @if (isArtisan && bk.status === 'PENDING') {
+        <div class="flex items-center space-x-2">
+          <button
+            type="button"
+            (click)="handleReject($event)"
+            class="px-3 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-50 rounded-xl border border-slate-200 transition cursor-pointer"
+          >
+            Decline
+          </button>
+          <button
+            type="button"
+            (click)="handleAccept($event)"
+            class="px-3.5 py-1.5 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition cursor-pointer flex items-center space-x-1"
+          >
+            <svg lucideCheckCircle class="h-3.5 w-3.5"></svg>
+            <span>Confirm</span>
+          </button>
+        </div>
+      }
+
+      @if (isArtisan && bk.status === 'CONFIRMED') {
+        <button
+          type="button"
+          (click)="handleComplete($event)"
+          class="px-3.5 py-1.5 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition cursor-pointer flex items-center space-x-1"
+        >
+          <svg lucideCheckCircle class="h-3.5 w-3.5"></svg>
+          <span>Mark Completed</span>
+        </button>
+      }
+
+      <button
+        type="button"
+        (click)="handleCardClick()"
+        class="p-1.5 rounded-lg hover:bg-slate-50 border border-slate-200 text-slate-500 transition cursor-pointer"
+      >
+        <svg lucideChevronRight class="h-4.5 w-4.5"></svg>
+      </button>
+    </div>
+  </div>
+</div>
