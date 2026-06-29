@@ -133,7 +133,20 @@
         <!-- Portfolio grid -->
         <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
           <h3 class="font-extrabold text-slate-900 text-sm pb-2 border-b border-slate-50">Recent Portfolio Projects</h3>
-          <p class="text-xs text-slate-400 py-6 text-center">No portfolio pictures uploaded yet.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            @for (img of portfolioImages; track img; let idx = $index) {
+              <div class="relative overflow-hidden rounded-2xl group border border-slate-100 shadow-sm aspect-video sm:aspect-square">
+                <img
+                  [src]="img"
+                  [alt]="'Portfolio project ' + (idx + 1)"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <span class="text-[10px] font-black text-white uppercase tracking-wider">Project {{ idx + 1 }} - Completed</span>
+                </div>
+              </div>
+            }
+          </div>
         </div>
 
         <!-- Reviews list -->
@@ -148,7 +161,7 @@
                 <div class="pt-4 first:pt-0 space-y-2">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2.5">
-                      <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=client" alt="Client Avatar" class="h-8 w-8 rounded-full object-cover" />
+                      <img [src]="'https://api.dicebear.com/7.x/pixel-art/svg?seed=' + r.clientName" alt="Client Avatar" class="h-8 w-8 rounded-full object-cover" />
                       <div>
                         <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ r.clientName }}</h4>
                         <span class="text-[9px] text-slate-400">{{ r.createdAt | date:'shortDate' }}</span>

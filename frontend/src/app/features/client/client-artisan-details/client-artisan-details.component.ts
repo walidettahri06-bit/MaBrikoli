@@ -151,4 +151,44 @@ export class ClientArtisanDetailsComponent implements OnInit {
     const a = this.artisan();
     return a && a.categories ? a.categories.map(c => c.name) : [];
   }
+
+  get portfolioImages(): string[] {
+    const p = this.profession;
+    if (p === 'Plumber' || p === 'Plomberie') {
+      return [
+        'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80'
+      ];
+    } else if (p === 'Electrician' || p === 'Électricité') {
+      return [
+        'https://images.unsplash.com/photo-1621905252507-b354bc25edac?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+      ];
+    } else if (p === 'Carpenter' || p === 'Menuiserie') {
+      return [
+        'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1537460224974-115989028857?auto=format&fit=crop&w=600&q=80'
+      ];
+    } else if (p === 'Welder' || p === 'Soudure') {
+      return [
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1516216628859-9bccecab13ca?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80'
+      ];
+    } else if (p === 'Painter' || p === 'Peinture') {
+      return [
+        'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80',
+        'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80'
+      ];
+    }
+    return [
+      'https://images.unsplash.com/photo-1581094288338-2314dddb7ecc?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+    ];
+  }
 }

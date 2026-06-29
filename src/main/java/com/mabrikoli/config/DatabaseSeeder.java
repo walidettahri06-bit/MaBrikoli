@@ -5,6 +5,8 @@ import com.mabrikoli.entity.ArtisanProfile;
 import com.mabrikoli.entity.Category;
 import com.mabrikoli.entity.User;
 import com.mabrikoli.entity.VerificationDocument;
+import com.mabrikoli.entity.Booking;
+import com.mabrikoli.entity.Review;
 import com.mabrikoli.enums.ApplicationStatus;
 import com.mabrikoli.enums.DocumentType;
 import com.mabrikoli.enums.Role;
@@ -12,6 +14,8 @@ import com.mabrikoli.repository.ArtisanApplicationRepository;
 import com.mabrikoli.repository.ArtisanProfileRepository;
 import com.mabrikoli.repository.CategoryRepository;
 import com.mabrikoli.repository.UserRepository;
+import com.mabrikoli.repository.BookingRepository;
+import com.mabrikoli.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -44,6 +48,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ArtisanProfileRepository artisanProfileRepository;
     private final ArtisanApplicationRepository artisanApplicationRepository;
+    private final BookingRepository bookingRepository;
+    private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -57,17 +63,33 @@ public class DatabaseSeeder implements CommandLineRunner {
             List<Category> categories = seedCategories();
 
             // 3. Seed 5 Clients
-            seedClients();
+            List<User> clients = seedClients();
 
             // 4. Seed 5 Approved Artisans
-            seedApprovedArtisans(categories);
+            List<ArtisanProfile> artisans = seedApprovedArtisans(categories);
 
             // 5. Seed 3 Pending Artisans
             seedPendingArtisans(categories);
 
+            // 6. Seed Bookings and Reviews
+            seedBookingsAndReviews(clients, artisans, categories);
+
             log.info("Database seeding completed successfully!");
         } else {
             log.debug("Database already contains categories. Skipping other seed elements.");
+
+            // Check if we need to seed bookings and reviews for existing database
+            if (bookingRepository.count() == 0) {
+                log.info("Database contains categories but no bookings. Seeding bookings and reviews for existing profiles...");
+                List<User> clients = userRepository.findAll().stream()
+                        .filter(u -> u.getRole() == Role.ROLE_CLIENT)
+                        .toList();
+                List<ArtisanProfile> artisans = artisanProfileRepository.findAll();
+                List<Category> categories = categoryRepository.findAll();
+                if (clients.size() >= 5 && artisans.size() >= 5 && categories.size() >= 5) {
+                    seedBookingsAndReviews(clients, artisans, categories);
+                }
+            }
         }
     }
 
@@ -120,7 +142,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
     }
 
-    private void seedClients() {
+    private List<User> seedClients() {
         log.info("Seeding 5 Client accounts...");
         List<User> clients = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
@@ -135,11 +157,12 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .emailVerified(true)
                     .build());
         }
-        userRepository.saveAll(clients);
+        return userRepository.saveAll(clients);
     }
 
-    private void seedApprovedArtisans(List<Category> categories) {
+    private List<ArtisanProfile> seedApprovedArtisans(List<Category> categories) {
         log.info("Seeding 5 Approved Artisan accounts and profiles...");
+        List<ArtisanProfile> profiles = new ArrayList<>();
         String[] cities = {"Casablanca", "Rabat", "Marrakech", "Tangier", "Fes"};
         String[] bios = {
                 "Professional plumber with 8 years of experience, ready for pipe fixing, installations, and drainage cleaning.",
@@ -179,8 +202,9 @@ public class DatabaseSeeder implements CommandLineRunner {
             // Link category (Artisan 1 gets Plumber, Artisan 2 gets Electrician, etc.)
             profile.addCategory(categories.get(i - 1));
 
-            artisanProfileRepository.save(profile);
+            profiles.add(artisanProfileRepository.save(profile));
         }
+        return profiles;
     }
 
     private void seedPendingArtisans(List<Category> categories) {
@@ -233,6 +257,121 @@ public class DatabaseSeeder implements CommandLineRunner {
             application.addDocument(nationalId);
 
             artisanApplicationRepository.save(application);
+        }
+    }
+
+    private void seedBookingsAndReviews(List<User> clients, List<ArtisanProfile> artisans, List<Category> categories) {
+        log.info("Seeding bookings and client reviews...");
+
+        String[][] comments = {
+            {
+                "Exceptional service! Fixed our bathroom pipe leak in under an hour. Highly recommended.",
+                "Very professional and punctual. Did a great job installing the kitchen faucet."
+            },
+            {
+                "Great work installing our smart lighting system. Very clean and precise wiring.",
+                "Quickly resolved a short circuit issue that other electricians couldn't find."
+            },
+            {
+                "Built custom cabinets for our laundry room. Excellent woodwork quality.",
+                "Stunning workmanship on the wooden dining table. Absolute master craftsman."
+            },
+            {
+                "Fabricated and installed a beautiful wrought iron gate. Extremely solid work.",
+                "Welded our broken metal fence. Very fast response and clean weld lines."
+            },
+            {
+                "Immaculate painting of our living room walls. No mess left behind, perfect finish!",
+                "Excellent wall prep and paint finish. Our hallway looks brand new."
+            }
+        };
+
+        int[][] ratings = {
+            {5, 4},
+            {5, 5},
+            {4, 5},
+            {5, 4},
+            {5, 5}
+        };
+
+        for (int i = 0; i < 5; i++) {
+            ArtisanProfile artisan = artisans.get(i);
+            if (artisan.getCategories().isEmpty()) {
+                continue;
+            }
+            Category category = artisan.getCategories().iterator().next();
+
+            User client1 = clients.get(i);
+            User client2 = clients.get((i + 1) % 5);
+            User client3 = clients.get((i + 2) % 5);
+
+            // Completed Booking 1
+            Booking b1 = Booking.builder()
+                    .client(client1)
+                    .artisan(artisan)
+                    .category(category)
+                    .description("Completed service job 1 for " + category.getName())
+                    .address(client1.getFirstName() + " Home Address")
+                    .city(artisan.getCity())
+                    .bookingDate(java.time.LocalDate.now().minusDays(10))
+                    .status(com.mabrikoli.enums.BookingStatus.COMPLETED)
+                    .estimatedPrice(java.math.BigDecimal.valueOf(artisan.getHourlyPrice() * 2))
+                    .finalPrice(java.math.BigDecimal.valueOf(artisan.getHourlyPrice() * 2))
+                    .build();
+            b1 = bookingRepository.save(b1);
+
+            Review r1 = Review.builder()
+                    .booking(b1)
+                    .client(client1)
+                    .artisan(artisan)
+                    .rating(ratings[i][0])
+                    .comment(comments[i][0])
+                    .build();
+            reviewRepository.save(r1);
+
+            // Completed Booking 2
+            Booking b2 = Booking.builder()
+                    .client(client2)
+                    .artisan(artisan)
+                    .category(category)
+                    .description("Completed service job 2 for " + category.getName())
+                    .address(client2.getFirstName() + " Home Address")
+                    .city(artisan.getCity())
+                    .bookingDate(java.time.LocalDate.now().minusDays(5))
+                    .status(com.mabrikoli.enums.BookingStatus.COMPLETED)
+                    .estimatedPrice(java.math.BigDecimal.valueOf(artisan.getHourlyPrice() * 3))
+                    .finalPrice(java.math.BigDecimal.valueOf(artisan.getHourlyPrice() * 3))
+                    .build();
+            b2 = bookingRepository.save(b2);
+
+            Review r2 = Review.builder()
+                    .booking(b2)
+                    .client(client2)
+                    .artisan(artisan)
+                    .rating(ratings[i][1])
+                    .comment(comments[i][1])
+                    .build();
+            reviewRepository.save(r2);
+
+            // Pending/Accepted Booking 3
+            Booking b3 = Booking.builder()
+                    .client(client3)
+                    .artisan(artisan)
+                    .category(category)
+                    .description("Pending maintenance request for " + category.getName())
+                    .address(client3.getFirstName() + " Office Address")
+                    .city(artisan.getCity())
+                    .bookingDate(java.time.LocalDate.now().plusDays(2))
+                    .status(i % 2 == 0 ? com.mabrikoli.enums.BookingStatus.PENDING : com.mabrikoli.enums.BookingStatus.ACCEPTED)
+                    .estimatedPrice(java.math.BigDecimal.valueOf(artisan.getHourlyPrice() * 4))
+                    .build();
+            bookingRepository.save(b3);
+
+            // Update profile stats
+            double avg = (ratings[i][0] + ratings[i][1]) / 2.0;
+            artisan.setAverageRating(avg);
+            artisan.setTotalReviews(2);
+            artisanProfileRepository.save(artisan);
         }
     }
 }
