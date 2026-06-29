@@ -1,25 +1,18 @@
-# ====================================
-#   Mabrikoli API — Application Config
-# ====================================
-
 server:
   port: 8080
   servlet:
     context-path: /api
 
-# ---- Spring Core ----
 spring:
   application:
     name: mabrikoli-api
 
-  # ---- Datasource ----
   datasource:
-  url: ${MYSQL_URL}
-  username: ${MYSQLUSER}
-  password: ${MYSQLPASSWORD}
-  driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQLUSER}
+    password: ${MYSQLPASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # ---- JPA / Hibernate ----
   jpa:
     hibernate:
       ddl-auto: update
@@ -32,39 +25,8 @@ spring:
           time_zone: UTC
     open-in-view: false
 
-  # ---- Jackson ----
   jackson:
     serialization:
       write-dates-as-timestamps: false
     time-zone: UTC
     default-property-inclusion: non_null
-
-# ---- JWT ----
-app:
-  jwt:
-    secret: bWFicmlrb2xpLXNlY3VyaXR5LWtleS10aGlzLXNob3VsZC1iZS1jaGFuZ2VkLWluLXByb2R1Y3Rpb24tZW52aXJvbm1lbnQ=
-    expiration-ms: 86400000        # 24 hours
-    refresh-expiration-ms: 604800000  # 7 days
-
-  # ---- Pagination ----
-  pagination:
-    default-page-size: 10
-    max-page-size: 50
-
-# ---- Springdoc / Swagger ----
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    operations-sorter: method
-    tags-sorter: alpha
-    display-request-duration: true
-
-# ---- Logging ----
-logging:
-  level:
-    root: INFO
-    com.mabrikoli: DEBUG
-    org.springframework.security: INFO
-    org.hibernate.SQL: WARN
